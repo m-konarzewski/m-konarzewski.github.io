@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+	<channel>
+		<title>Concepts on Video Streaming in C&#43;&#43;</title>
+		<link>http://localhost:1313/tags/concepts/</link>
+		<description>Recent content in Concepts on Video Streaming in C&#43;&#43;</description>
+		<generator>Hugo</generator>
+		<language>pl-PL</language>
+		
+		
+		
+		
+			<lastBuildDate>Sat, 18 Jul 2026 10:00:00 +0200</lastBuildDate>
+		
+			<atom:link href="http://localhost:1313/tags/concepts/index.xml" rel="self" type="application/rss+xml" />
+			<item>
+				<title>is_one_of in C&#43;&#43;20: fold expressions and concepts in practice</title>
+				<link>http://localhost:1313/posts/fold-expressions-is-one-of/</link>
+				<pubDate>Sat, 18 Jul 2026 10:00:00 +0200</pubDate>
+				<guid>http://localhost:1313/posts/fold-expressions-is-one-of/</guid>
+				<description>A short example of the is_one_of helper built using fold expressions and C++20 concepts.</description>
+			</item>
+	</channel>
+</rss>

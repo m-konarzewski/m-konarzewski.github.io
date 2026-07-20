@@ -1,0 +1,90 @@
+baseURL = "https://m-konarzewski.github.io/"
+locale = "pl-PL"
+title = "Video Streaming in C++"
+theme = "Coder"
+
+pagination.pagerSize = 10
+
+enableRobotsTXT = true
+enableEmoji = true
+
+[taxonomies]
+  category = "categories"
+  tag = "tags"
+  series = "series"
+
+[params]
+  author = "Michał Konarzewski"
+  description = "Blog about C++, FFmpeg and video streaming"
+  keywords = "cpp,c++,ffmpeg,video streaming"
+  info = "Senior C++ Software Developer"
+  avatarurl = ""
+
+  colorScheme = "auto"
+  hideColorSchemeToggle = false
+
+  since = 2026
+
+  customCSS = ["css/custom.css"]
+
+  [params.utterances]
+    repo = "m-konarzewski/m-konarzewski.github.io"
+    issueTerm = "pathname"
+    label = "comments"
+    theme = "github-light"
+
+  # Podświetlanie skladni kodu (wazne dla postow o C++)
+  [params.codeCopyButton]
+    enable = true
+
+[markup]
+  [markup.highlight]
+    style = "monokai"
+    lineNos = true
+    tabWidth = 4
+    guessSyntax = true
+  [markup.goldmark.renderer]
+    unsafe = true
+
+[[menu.main]]
+  name = "Home"
+  url = "/"
+  weight = 1
+
+[[menu.main]]
+  name = "C++"
+  url = "/categories/c++/"
+  weight = 2
+
+[[menu.main]]
+  name = "FFmpeg"
+  url = "/categories/ffmpeg/"
+  weight = 3
+
+[[menu.main]]
+  name = "Video Streaming"
+  url = "/categories/video-streaming/"
+  weight = 4
+
+[[menu.main]]
+  name = "All categories"
+  url = "/categories/"
+  weight = 5
+
+[[menu.main]]
+  name = "Tags"
+  url = "/tags/"
+  weight = 6
+
+[[menu.main]]
+  name = "About me"
+  url = "/about/"
+  weight = 7
+
+[privacy]
+  [privacy.vimeo]
+    disabled = false
+    simple = true
+  [privacy.youtube]
+    disabled = false
+    privacyEnhanced = true

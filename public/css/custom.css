@@ -1,0 +1,57 @@
+.content article p {
+  -ms-hyphens: none;
+  -webkit-hyphens: none;
+  hyphens: none;
+}
+
+/* Global page width override */
+.container {
+  max-width: min(100rem, 100%) !important;
+}
+
+/* About page profile layout */
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(16rem, 30rem);
+  gap: 3rem;
+  align-items: start;
+  width: 100%;
+  max-width: none;
+}
+
+.about-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.about-copy p {
+  margin: 0;
+  line-height: 1.85;
+}
+
+.about-photo {
+  position: sticky;
+  top: 6rem;
+  align-self: start;
+}
+
+.about-photo img {
+  width: 100%;
+  height: auto;
+  border-radius: 1.4rem;
+  box-shadow: 0 36px 80px rgba(0, 0, 0, 0.16);
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 980px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-photo {
+    position: relative;
+    top: auto;
+  }
+}
