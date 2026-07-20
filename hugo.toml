@@ -88,3 +88,7 @@ enableEmoji = true
   [privacy.youtube]
     disabled = false
     privacyEnhanced = true
+
+[caches]
+  [caches.images]
+    dir = ':cacheDir/images'
