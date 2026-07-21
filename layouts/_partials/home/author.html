@@ -1,0 +1,28 @@
+{{ $recentPosts := where .Site.RegularPages "Section" "posts" | first 3 }}
+
+<section class="home-hero__posts">
+  <div class="home-hero__intro-block">
+    <p>
+      This blog is about C++, video streaming, and FFmpeg. I write about
+      practical techniques, implementation details, and real-world challenges in
+      building media-focused software and high-performance applications.
+    </p>
+  </div>
+
+  <div class="home-hero__posts-header">
+    <h2>Latest posts</h2>
+    <a href="/posts/">See all posts</a>
+  </div>
+
+  <div class="home-hero__posts-list">
+    {{ range $recentPosts }}
+    <article class="home-hero__post-card">
+      <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+      <p>{{ .Summary | plainify | truncate 140 }}</p>
+      <p class="home-hero__meta">{{ .Date.Format "2006-01-02" }}</p>
+    </article>
+    {{ else }}
+    <p class="home-hero__empty">No posts yet — check back soon.</p>
+    {{ end }}
+  </div>
+</section>

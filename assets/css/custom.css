@@ -9,6 +9,15 @@
   max-width: min(100rem, 100%) !important;
 }
 
+/* Keep the home page content flowing naturally instead of vertically centering it */
+.centered {
+  display: block;
+}
+
+.centered .about {
+  text-align: left;
+}
+
 /* About page profile layout */
 .about-grid {
   display: grid;
@@ -54,4 +63,67 @@
     position: relative;
     top: auto;
   }
+}
+
+.home-hero__posts {
+  margin-top: 0.35rem;
+  padding: 0.2rem 0 0;
+}
+
+.home-hero__intro-block {
+  margin-bottom: 0.7rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.home-hero__intro-block h2 {
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+}
+
+.home-hero__intro-block p {
+  margin: 0;
+  line-height: 1.8;
+}
+
+.home-hero__posts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.home-hero__posts-list {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.home-hero__post-card {
+  padding: 0.8rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.home-hero__post-card:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.home-hero__post-card h3 {
+  margin-bottom: 0.3rem;
+}
+
+.home-hero__post-card p {
+  margin: 0;
+  line-height: 1.7;
+}
+
+.home-hero__meta {
+  font-size: 0.9rem;
+  opacity: 0.75;
+  margin-top: 0.35rem !important;
+}
+
+.home-hero__empty {
+  opacity: 0.8;
 }

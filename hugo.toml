@@ -1,5 +1,5 @@
 baseURL = "https://m-konarzewski.github.io/"
-locale = "pl-PL"
+locale = "en-US"
 title = "Video Streaming in C++"
 theme = "Coder"
 
@@ -67,19 +67,14 @@ enableEmoji = true
   weight = 4
 
 [[menu.main]]
-  name = "All categories"
-  url = "/categories/"
+  name = "Linux"
+  url = "/categories/linux/"
   weight = 5
-
-[[menu.main]]
-  name = "Tags"
-  url = "/tags/"
-  weight = 6
 
 [[menu.main]]
   name = "About me"
   url = "/about/"
-  weight = 7
+  weight = 6
 
 [privacy]
   [privacy.vimeo]
