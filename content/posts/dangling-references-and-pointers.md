@@ -2,7 +2,7 @@
 draft = false
 date = 2026-07-21T15:00:00+02:00
 title = "Dangling references and pointers: Mistakes that keep showing up"
-tags = ["pointers", "references", "memory-safety", "c++"]
+tags = ["pointers", "references", "memory-safety", "C++23", "dangling"]
 categories = ["C++"]
 +++
 
