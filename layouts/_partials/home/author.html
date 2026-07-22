@@ -5,7 +5,8 @@
     <p>
       This blog is about C++, video streaming, and FFmpeg. I write about
       practical techniques, implementation details, and real-world challenges in
-      building media-focused software and high-performance applications.
+      building media-focused software and high-performance applications. Posts
+      are usually AI-generated and then reviewed by a human before publication.
     </p>
   </div>
 
@@ -18,7 +19,6 @@
     {{ range $recentPosts }}
     <article class="home-hero__post-card">
       <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-      <p>{{ .Summary | plainify | truncate 140 }}</p>
       <p class="home-hero__meta">{{ .Date.Format "2006-01-02" }}</p>
     </article>
     {{ else }}

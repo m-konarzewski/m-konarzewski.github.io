@@ -1,10 +1,9 @@
 ---
-title: "is_one_of in C++20: fold expressions and concepts in practice"
-date: 2026-07-18T10:00:00+02:00
-categories: ["C++"]
-tags: ["templates", "concepts", "fold-expressions", "c++20", "is_one_of"]
 draft: false
-summary: "A short example of the is_one_of helper built using fold expressions and C++20 concepts."
+date: 2026-07-18T10:00:00+02:00
+title: "is_one_of in C++20: Fold expressions and concepts in practice"
+tags: ["templates", "concepts", "fold-expressions", "c++20", "is_one_of"]
+categories: ["C++"]
 ---
 
 ## Problem: the `if` that grows without end
