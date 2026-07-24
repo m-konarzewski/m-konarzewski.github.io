@@ -1,5 +1,5 @@
 ---
-draft: true
+draft: false
 date: 2026-07-23T10:00:00+02:00
 title: "std::ios::sync_with_stdio: What it actually does and when it bites"
 tags: ["C++", "iostream", "Performance", "stdio"]
