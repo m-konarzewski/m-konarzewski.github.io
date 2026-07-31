@@ -1,8 +1,8 @@
 +++ 
-draft = true
+draft = false
 date = 2026-07-30T17:02:47+02:00
 title = "The fundamentals of Videos"
-tags = ["Video"]
+tags = ["video", "video streaming", "video fundamentals", "codecs", "compression"]
 categories = ["video-streaming"]
 +++
 
