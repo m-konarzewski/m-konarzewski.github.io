@@ -1,13 +1,11 @@
 +++ 
 draft = false
 date = 2026-07-30T09:39:12+02:00
-title = "Tag Dispatch in C++: A Compile-Time Pattern That Refuses to Die"
+title = "Tag dispatch in C++: a compile-time pattern that refuses to die"
 description = ""
 tags = ["C++", "C++20", "Tag dispatch", "Concepts", "SFINAE", "Templates"]
 categories = ["C++"]
 +++
-
-# Tag Dispatch in C++: A Compile-Time Pattern That Refuses to Die
 
 ## 1. Introduction — What Problem Are We Solving?
 

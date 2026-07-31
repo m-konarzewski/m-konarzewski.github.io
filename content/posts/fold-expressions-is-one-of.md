@@ -1,7 +1,7 @@
 ---
 draft: false
 date: 2026-07-18T10:00:00+02:00
-title: "is_one_of in C++20: Fold expressions and concepts in practice"
+title: "Fold expressions and concepts in practice: is_one_of in C++20"
 tags: ["templates", "concepts", "fold-expressions", "c++20", "is_one_of"]
 categories: ["C++"]
 ---

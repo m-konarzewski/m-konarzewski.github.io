@@ -1,7 +1,7 @@
 +++ 
 draft = false
 date = 2026-07-23T09:41:28+02:00
-title = "std::string_view in C++17: The Pitfalls Nobody Warns You About"
+title = "std::string_view in C++17: the pitfalls nobody warns you about"
 tags = ["C++", "std::string_view", "std::string"]
 categories = ["C++"]
 +++
