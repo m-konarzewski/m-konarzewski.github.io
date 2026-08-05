@@ -22,6 +22,8 @@ This phenomenon, known as **persistence of vision** (though modern science sugge
 
 The consequence for us is simple but fundamental: **every video file, no matter how technically sophisticated, boils down to a sequence of images plus information about how fast to display them.** Everything else — codecs, containers, streaming protocols — is engineering built around that one simple idea, all in service of one question: how do we store and transmit that sequence as efficiently as possible.
 
+<img src="/images/frame-sequence-motion.svg" alt="A sequence of individual frames perceived as motion">
+
 ## Anatomy of a single frame
 
 Before moving on to sequences, let's pause on a single frame, since it's the basic unit everything else is built from.
@@ -46,6 +48,8 @@ In the world of video, however, a different model is very commonly used: **YCbCr
 Why does this matter? Because the human eye is **far** more sensitive to changes in brightness than to changes in color. This observation from the physiology of vision opens the door to one of the oldest and most effective tricks in image compression: **chroma subsampling** — storing color information at a lower resolution than brightness information, without a noticeable loss of quality for most viewers.
 
 Familiar-looking notations like **4:2:0** or **4:4:4** describe exactly this degree of "savings" on color relative to brightness. In the 4:2:0 format — the most common in consumer video — color information is stored at a resolution four times lower than brightness information. It's one of those things that's everywhere, yet few people know it exists until they dig a bit deeper into the topic.
+
+<img src="/images/rgb-vs-ycbcr-subsampling.svg" alt="RGB versus YCbCr with 4:2:0 chroma subsampling">
 
 ### Frames per second
 
@@ -78,6 +82,8 @@ At 30 frames per second, that's already:
 One minute of such raw video comes out to over **10 gigabytes**. A feature-length film at this quality, with no compression at all, would weigh several terabytes.
 
 For comparison: a ten-minute video in Full HD, uploaded to a popular streaming platform, typically weighs a few dozen to a few hundred megabytes. A difference on the order of 100-1000x doesn't come from nowhere — it's the work of **compression**, or more precisely, what codecs do, and they are the true hero of this whole story.
+
+<img src="/images/raw-video-data-growth.svg" alt="Raw video data growth: from a single frame to a full movie">
 
 It's worth remembering this order of magnitude, because it explains why the entire video industry — from Netflix to a simple video call — is built around one unrelenting trade-off: **image quality versus the amount of data to transmit and store.**
 
@@ -114,6 +120,8 @@ This leads to two additional frame types:
 - **B-frame** (_bidirectional frame_) — a frame describing the difference relative to frames both preceding and following it in display order. This sounds somewhat paradoxical — how can a frame reference one that hasn't "happened yet"? The answer lies in the fact that **encoding order and display order don't have to match**. A codec can encode (and transmit) frames in an order different from the one in which they'll ultimately be displayed, precisely so the decoder has both the past and the future relative to a given B-frame "on hand" before it plays it back.
 
 The key mechanism behind inter-frame compression is **motion compensation**. Rather than simply subtracting the pixels of two consecutive frames from each other (which handles motion poorly), the algorithm tries to find where a given portion of the image moved to between frames, and store that motion as a displacement vector plus a small correction. If a ball on screen moved 10 pixels to the right, the codec can encode "the same chunk of image, shifted 10 pixels right" instead of describing every pixel of the ball at its new position from scratch. That's far cheaper in terms of the amount of data required.
+
+
 
 ### GOP — group of pictures
 

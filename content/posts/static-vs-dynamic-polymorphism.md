@@ -1,7 +1,7 @@
 +++ 
 draft = false
 date = 2026-07-27T11:14:18+02:00
-title = "Static vs. dynamic polymorphism in C++: complete guide"
+title = "Static vs. dynamic polymorphism in C++: Complete guide"
 tags = ["C++20", "Polymorphism", "Templates", "CRTP", "Type erasure"]
 categories = ["C++"]
 +++
