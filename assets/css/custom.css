@@ -6,7 +6,7 @@
 
 /* Global page width override */
 .container {
-  max-width: min(100rem, 100%) !important;
+  max-width: min(90rem, 100%) !important;
 }
 
 /* Keep the home page content flowing naturally instead of vertically centering it */
@@ -126,4 +126,56 @@
 
 .home-hero__empty {
   opacity: 0.8;
+}
+
+/* Wider category and tag lists */
+section.container.list {
+  max-width: min(100rem, 100%) !important;
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+.list ul {
+  width: 100%;
+}
+
+.list ul li {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: baseline;
+  width: 100%;
+}
+
+.list ul li .date {
+  flex: 0 0 12rem !important;
+  width: 12rem !important;
+  min-width: 12rem !important;
+  text-align: right;
+  margin-right: 0;
+}
+
+.list ul li .title {
+  flex: 1 1 auto !important;
+  min-width: 0;
+  word-break: break-word;
+}
+
+@media (max-width: 980px) {
+  section.container.list,
+  .list ul,
+  .list ul li {
+    width: 100% !important;
+  }
+
+  .list ul li {
+    display: block !important;
+  }
+
+  .list ul li .date {
+    display: block !important;
+    width: 100% !important;
+    text-align: left;
+    margin-bottom: 0.75rem;
+  }
 }
