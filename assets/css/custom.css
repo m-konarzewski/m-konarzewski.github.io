@@ -141,23 +141,29 @@ section.container.list {
 
 .list ul li {
   display: flex !important;
-  flex-wrap: wrap;
+  flex-wrap: nowrap !important;
   gap: 1rem;
   align-items: baseline;
   width: 100%;
+  max-width: 100%;
 }
 
 .list ul li .date {
-  flex: 0 0 12rem !important;
-  width: 12rem !important;
-  min-width: 12rem !important;
+  flex: 0 0 13.5rem !important;
+  width: 13.5rem !important;
+  min-width: 13.5rem !important;
+  max-width: 13.5rem !important;
   text-align: right;
   margin-right: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .list ul li .title {
   flex: 1 1 auto !important;
   min-width: 0;
+  overflow-wrap: anywhere;
   word-break: break-word;
 }
 
