@@ -1,5 +1,5 @@
 +++ 
-draft = false
+draft = true
 date = 2026-08-12T08:27:58+02:00
 title = "Iterator categories in C++: A complete reference"
 tags = ["C++", "iterators", "STL", "templates", "tag-dispatch", "concepts"]
