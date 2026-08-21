@@ -6,8 +6,6 @@ tags = ["C++", "std::tuple", "std::pair", "piecewise-construct", "forward-as-tup
 categories = ["C++"]
 +++
 
-# `piecewise_construct`, `forward_as_tuple`, `tie`, and `tuple_cat`: A Practical Comparison
-
 The `<tuple>` header hides a small family of utilities that look superficially similar — they all traffic in `std::tuple`, they all show up in "modern C++" checklists, and they're often name-dropped together without much explanation of what actually distinguishes them. In reality, `std::forward_as_tuple`, `std::piecewise_construct`, `std::tie`, and `std::tuple_cat` solve four genuinely different problems, and mixing them up tends to produce code that either doesn't compile, compiles but silently copies things you meant to move, or compiles and moves things you meant to keep alive.
 
 This article walks through each one individually, in enough depth to use them correctly, and then puts them side by side so the differences are impossible to forget.
