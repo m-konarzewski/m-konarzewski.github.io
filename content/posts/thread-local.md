@@ -1,7 +1,7 @@
 +++ 
 draft = false
 date = 2026-08-31T22:03:48+02:00
-title = "thread_local: Storage Duration, Initialization, Cost, and the Traps That Bite in Production"
+title = "thread_local: Storage Duration, Initialization and Cost"
 tags = ["C++", "thread-local", "storage-duration", "concurrency"]
 categories = ["C++"]
 +++
