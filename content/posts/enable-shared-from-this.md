@@ -26,7 +26,7 @@ This compiles. It also creates a second, completely independent **control block*
 
 `enable_shared_from_this` exists specifically to solve this: to give an object a way to correctly obtain a `shared_ptr` to itself, one that shares the _original_ control block instead of fabricating a new one.
 
-## 2. The Mechanism
+## 2. The mechanism
 
 You use it via CRTP — a pattern covered in more depth in the earlier post on the virtual constructor idiom, where CRTP eliminated `clone()` boilerplate; here it does something structurally different but syntactically identical:
 
@@ -52,7 +52,7 @@ auto conn = std::make_shared<Connection>();
 // wired up to observe conn's control block — no explicit step needed
 ```
 
-## 3. `shared_from_this()` Step by Step
+## 3. `shared_from_this()` step by step
 
 Calling `shared_from_this()` does something conceptually simple: it locks the internal `weak_ptr`.
 
@@ -64,7 +64,7 @@ std::shared_ptr<T> enable_shared_from_this<T>::shared_from_this() {
 
 Because `weak_this_` observes the _original_ control block — the one created when the object was first wrapped in a `shared_ptr` — the `shared_ptr` returned by `shared_from_this()` increments that same, original reference count. It doesn't create a new one. Every `shared_ptr` obtained this way, and the original `shared_ptr` the object was constructed through, all agree on when the object should actually be destroyed, because they're all sharing one refcount and one deleter, instead of racing between two independent ones as in Section 1's broken example.
 
-## 4. The Critical Pitfall: The Object Must Already Be `shared_ptr`-Managed
+## 4. The critical pitfall: The object must already be `shared_ptr`-managed
 
 `shared_from_this()`'s correctness depends entirely on `weak_this_` having been wired up by that constructor hook — which only happens if the object was, at some point, wrapped in a `shared_ptr`. If it wasn't — a stack-allocated object, or one created with a bare `new` that's never handed to a `shared_ptr` — `weak_this_` is empty, and calling `shared_from_this()` on it is a direct path to failure:
 
@@ -82,7 +82,7 @@ void also_broken() {
 
 Since C++17, this specific failure mode (an empty `weak_this_`) reliably throws `std::bad_weak_ptr` rather than invoking undefined behavior — the standard tightened this exact guarantee in C++17, where earlier it was looser and implementation-defined. But "throws instead of corrupting memory" is a low bar, not a design goal — a `std::bad_weak_ptr` exception thrown from deep inside an async callback registration path, at runtime, in exactly the code path that only gets exercised when something upstream forgot to `make_shared` the object, is still a bug you'd much rather catch earlier. The core rule is simple to state and easy to violate in practice, especially across a large codebase: **never call `shared_from_this()` unless you can be certain, structurally, that the object is currently owned by at least one `shared_ptr`.**
 
-## 5. Typical Applications
+## 5. Typical applications
 
 **Asynchronous callback lifetime extension.** This is by far the most common real-world use. In event-driven or async I/O frameworks like Boost.Asio, an object needs to guarantee it stays alive for the duration of an in-flight asynchronous operation, even if every other `shared_ptr` to it goes out of scope in the meantime:
 
@@ -121,7 +121,7 @@ void maybe_register() {
 
 This is generally the better default whenever the calling context can't structurally guarantee `shared_ptr` ownership — library code called from contexts you don't fully control, for instance — since it turns a potential exception into an ordinary, checkable condition.
 
-## 7. Interaction with Inheritance
+## 7. Interaction with inheritance
 
 Multiple inheritance can create a genuine ambiguity: if two separate base classes each independently inherit from `enable_shared_from_this<Base1>` and `enable_shared_from_this<Base2>`, and a derived class inherits from both, the derived class ends up with two distinct `weak_this_` members and two distinct `shared_from_this()` overloads — an ambiguous call the compiler will reject outright.
 

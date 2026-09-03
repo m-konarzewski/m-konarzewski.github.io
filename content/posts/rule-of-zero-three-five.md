@@ -12,7 +12,7 @@ C++ classes have up to five **special member functions**: the destructor, the co
 
 That interaction — one declaration silently changing the generation of the rest — is the source of most of the historical bugs this family of rules exists to prevent. If you've followed the earlier posts here on `noexcept` and move semantics, or on the copy-and-swap idiom with a `friend swap`, you've already seen pieces of this picture. This post assembles the full picture: what the compiler generates by default, when that default is wrong, and the three "rules" — Zero, Three, and Five — that summarize how to get it right.
 
-## 2. Rule of Three
+## 2. Rule of three
 
 Before C++11, a class had three special member functions worth worrying about: the destructor, the copy constructor, and the copy assignment operator. The **Rule of Three** states: if you find yourself needing to explicitly define _any one_ of these three, you almost certainly need to define all three.
 
@@ -67,7 +67,7 @@ public:
 
 Now copying performs a real deep copy, and each `Buffer` genuinely owns its own allocation.
 
-## 3. Rule of Five
+## 3. Rule of five
 
 C++11 added move semantics, and with them, two more special member functions: the move constructor and the move assignment operator. The **Rule of Five** extends the Rule of Three: if you need to define any of the destructor, copy constructor, or copy assignment operator, you likely need to define — or at least explicitly consider — all five.
 
@@ -101,7 +101,7 @@ public:
 
 Marking these `noexcept` matters beyond documentation — as covered in the earlier post on `noexcept` and `std::vector` reallocation, containers like `std::vector` only use the move constructor during reallocation if it's marked `noexcept`; otherwise, for exception-safety reasons, they fall back to copying even when a perfectly good move constructor exists.
 
-## 4. The Generation Matrix: Who Disables Whom
+## 4. The generation matrix: Who disables whom
 
 This is the part most people get wrong from memory, because the actual rule isn't symmetric and isn't the same for every pair. The precise behavior:
 
@@ -182,7 +182,7 @@ This is the standard idiom for **move-only, non-copyable resource wrappers** —
 
 This distinction from Section 4 has a concrete, checkable effect: `std::is_copy_constructible_v<T>` and similar traits use SFINAE internally (see the earlier post on SFINAE for the mechanism) to check whether the relevant function is _usable_ — and a function defined as deleted is visible to name lookup and overload resolution, just unusable, which trips these traits the same way a normal, callable function would pass them. A function that was never declared at all behaves identically from the trait's point of view — either way, `is_copy_constructible_v` correctly reports `false`. The practical difference shows up at the call site: attempting to copy a type with a deleted copy constructor gives a clear "use of deleted function" diagnostic pointing at the exact declaration; a type that never had one implicitly generated, with no fallback, produces a message about no matching constructor instead. Explicitly writing `= delete` is almost always the more diagnosable choice, which is a good reason to prefer it over relying on implicit suppression even when the end result — non-copyability — is the same.
 
-## 6. Rule of Zero
+## 6. Rule of zero
 
 The Rule of Three and Rule of Five are correct, but they're also a lot of hand-written, error-prone boilerplate — a class with a raw resource needs somewhere between three and five carefully-written functions, each a fresh opportunity for a subtle bug. The modern default, the **Rule of Zero**, sidesteps the problem entirely: **design classes so they never need to define any of the five special member functions at all**, by delegating all resource ownership to types that already manage it correctly — `std::unique_ptr`, `std::shared_ptr`, `std::vector`, `std::string`, and similar RAII types.
 
@@ -201,7 +201,7 @@ public:
 
 This is why the standard advice for modern C++ is: **reach for `unique_ptr`, `shared_ptr`, `vector`, and `string` as members instead of raw owning pointers**, precisely so the class containing them can stay in Rule-of-Zero territory and never need Section 4's generation matrix at all.
 
-## 7. When Rule of Zero Isn't Enough
+## 7. When rule of zero isn't enough
 
 Rule of Zero covers the overwhelming majority of everyday classes, but a few scenarios genuinely need custom special member functions:
 

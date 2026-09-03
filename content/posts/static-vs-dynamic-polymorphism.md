@@ -156,7 +156,7 @@ Performance is a real factor, but in practice, this question about the openness 
 
 ---
 
-## Part 2: Design Consequences
+## Part 2: Design consequences
 
 ### 5. Comparison table — the trade-offs
 
@@ -201,7 +201,7 @@ Beyond the obvious "when I need runtime polymorphism," it's worth listing concre
 
 ---
 
-## Part 3: Applications and Patterns
+## Part 3: Applications and patterns
 
 Foundations and trade-offs are behind us. Time for concrete tools from modern C++ that, in practice, fill the space between pure `virtual` and pure templates.
 
@@ -364,7 +364,7 @@ That last row is particularly interesting: if you have an existing library `stru
 
 ---
 
-## Part 4: Wrapping Up
+## Part 4: Wrapping up
 
 ### 12. Decision framework
 

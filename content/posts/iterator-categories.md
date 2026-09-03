@@ -1,5 +1,5 @@
 +++ 
-draft = true
+draft = false
 date = 2026-08-12T08:27:58+02:00
 title = "Iterator categories in C++: A complete reference"
 tags = ["C++", "iterators", "STL", "templates", "tag-dispatch", "concepts"]
@@ -14,7 +14,7 @@ But not every container can support the same set of operations efficiently. A `s
 
 The solution is **iterator categories**: a hierarchy of interfaces, each one a strict superset of requirements over the one before it, letting algorithms declare exactly what they need and containers declare exactly what they can provide. This post works through all six categories in order, from weakest to strongest.
 
-## 2. The Category Hierarchy
+## 2. The category hierarchy
 
 Six categories, traditionally identified (pre-C++20) by empty "tag" structs in `<iterator>`:
 
@@ -28,7 +28,7 @@ Input and Output are the two most primitive categories, sitting at the base — 
 
 This cumulative structure is exactly why an algorithm requiring, say, a Forward Iterator will happily accept a `std::vector::iterator` (which is Contiguous, and therefore also everything below it) but will reject a `std::istream_iterator` (which is only Input).
 
-## 3. Input Iterator
+## 3. Input iterator
 
 The **Input Iterator** is the weakest category: single-pass, read-only traversal. "Single-pass" is the critical, easy-to-miss constraint — as covered in more depth in the earlier post on the semantic role of `++` in single-pass iterators, once you increment an Input Iterator, any copies of its old position are no longer guaranteed to be valid or comparable. You get exactly one look at each element, in order, moving forward, and that's it.
 
@@ -46,7 +46,7 @@ while (in != end) {
 
 `std::istream_iterator` is the textbook Input Iterator: reading from `std::cin` is inherently single-pass, since the underlying stream has no way to "rewind" to a previously-read position.
 
-## 4. Output Iterator
+## 4. Output iterator
 
 The **Output Iterator** is Input's mirror image: single-pass, write-only. Instead of `*it` producing a value, `*it = value` consumes one.
 
@@ -60,7 +60,7 @@ std::copy(source.begin(), source.end(), out);
 
 `std::back_insert_iterator` (produced by `std::back_inserter`) is the other common Output Iterator: `*it = value` translates into a `push_back(value)` call on the underlying container, letting algorithms like `std::copy` or `std::transform` append to a container they never explicitly resize or index into.
 
-## 5. Forward Iterator
+## 5. Forward iterator
 
 A **Forward Iterator** upgrades Input Iterator with the single guarantee that matters most for algorithm design: **multi-pass**. You can copy a Forward Iterator, advance the copy, and the original still points to the same valid position it did before — meaning you can traverse the same range more than once, or hold onto a position while continuing to advance a different iterator over the same range.
 
@@ -83,7 +83,7 @@ This function is impossible to write correctly against a plain Input Iterator �
 
 `std::forward_list::iterator` is the category's namesake example: a singly-linked list supports forward-only traversal, but — unlike a stream — it supports it repeatably, since the nodes themselves persist.
 
-## 6. Bidirectional Iterator
+## 6. Bidirectional iterator
 
 A **Bidirectional Iterator** adds exactly one capability over Forward: `operator--`, moving backward one position.
 
@@ -99,7 +99,7 @@ void print_reversed(BidirIt first, BidirIt last) {
 
 This requires the underlying data structure to support efficient backward traversal, which rules out singly-linked structures like `std::forward_list` but is straightforward for doubly-linked ones. `std::list::iterator` (a doubly-linked list, where each node has both `next` and `prev` pointers) and `std::map`/`std::set::iterator` (typically implemented as a red-black tree, where moving to the in-order predecessor is a well-defined, boundedly-efficient tree operation) are the standard examples.
 
-## 7. Random Access Iterator
+## 7. Random access iterator
 
 A **Random Access Iterator** is where iterators start behaving like raw pointer arithmetic: constant-time jumps to _any_ position, not just the adjacent one.
 
@@ -115,7 +115,7 @@ void quick_partition_demo(RandomIt first, RandomIt last) {
 
 This O(1) midpoint computation is exactly why algorithms like binary search or a from-scratch quicksort partition need Random Access specifically — walking to the midpoint one `++` at a time would silently degrade an O(log n) algorithm's complexity if the iterator only offered Bidirectional's interface. `std::vector::iterator` and `std::deque::iterator` are the standard examples — `deque`'s chunked, non-contiguous storage still supports O(1) random access via a layer of indirection, which is why it qualifies for this category despite not being contiguous (see the next section for why that distinction matters).
 
-## 8. Contiguous Iterator
+## 8. Contiguous iterator
 
 **Contiguous Iterator**, added formally in C++17 (with `std::contiguous_iterator` as a proper concept in C++20), doesn't add any new _operations_ over Random Access — the interface is identical. What it adds is a **guarantee about memory layout**: the elements the iterator ranges over are laid out contiguously in memory, such that `&*(it + n) == &*it + n` for any valid offset `n`.
 
@@ -123,7 +123,7 @@ This might look like a technicality, but it has real consequences. Code that nee
 
 `std::to_address(it)` (C++20) is the standard tool for safely obtaining the underlying raw pointer from a Contiguous Iterator without relying on `&*it`, which can misbehave for fancy pointer types (like the iterators of `std::vector<bool>`'s odd proxy-reference specialization, or custom allocator-aware pointer types). `std::array`, `std::vector` (except the `bool` specialization), and `std::string`/`std::string_view` all provide Contiguous Iterators.
 
-## 9. Comparative Table
+## 9. Comparative table
 
 Each row shows the _additional_ requirement introduced at that category, on top of everything above it in the table:
 
@@ -149,7 +149,7 @@ Representative standard-library iterators per category:
 | Random Access | `std::deque::iterator`                                                   |
 | Contiguous    | `std::vector::iterator`, `std::array::iterator`, `std::string::iterator` |
 
-## 10. C++20 Iterator Concepts
+## 10. C++20 iterator concepts
 
 Historically, categories were identified through **tag types** — empty structs like `std::input_iterator_tag`, `std::forward_iterator_tag`, each derived from the previous, used purely as compile-time markers via a nested `iterator_category` typedef (or, since C++17, via `std::iterator_traits<It>::iterator_category`). C++20 reframes the same six categories as actual **concepts**: `std::input_iterator`, `std::forward_iterator`, `std::bidirectional_iterator`, `std::random_access_iterator`, `std::contiguous_iterator`.
 
@@ -169,7 +169,7 @@ void advance_fast(It& it, std::ptrdiff_t n) {
 }
 ```
 
-## 11. Tag Dispatch by Iterator Category
+## 11. Tag dispatch by iterator category
 
 The categories aren't just documentation — they're routinely used to select genuinely different _implementations_ of the same algorithm at compile time, based on what an iterator can efficiently do. `std::advance` and `std::distance` are the canonical examples, and the technique is tag dispatch, covered in full in the earlier post on that idiom — here it's worth seeing tag dispatch applied specifically to iterator categories, since it's the pattern's most common real-world use in the standard library itself.
 

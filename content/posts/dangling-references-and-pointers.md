@@ -1,12 +1,10 @@
 +++
 draft = false
 date = 2026-07-21T15:00:00+02:00
-title = "Dangling references and pointers: Mistakes that keep showing up"
+title = "Dangling references and pointers"
 tags = ["pointers", "references", "memory-safety", "C++23", "dangling"]
 categories = ["C++"]
 +++
-
-# Dangling references and pointers in C++: 10 mistakes that keep showing up
 
 Dangling references and pointers are one of C++'s most persistent hazards. The compiler often stays silent, the code compiles cleanly, and the bug only shows up as intermittent crashes, corrupted data, or "works on my machine" behavior in production. This article walks through ten of the most common ways developers end up with dangling references or pointers, why they happen, and how to avoid them.
 

@@ -10,7 +10,7 @@ categories = ["C++"]
 
 This article works through `thread_local` from the standard's storage-duration model down to the ELF TLS (Executable and Linkable Format Thread-Local Storage) access models, then covers the two failure patterns that show up most often in real systems: dynamic-loading interactions and thread-pool state leakage.
 
-## 1. What `thread_local` Actually Is
+## 1. What `thread_local` actually is
 
 C++11 defines four storage durations: automatic, static, dynamic, and thread. `thread_local` is the keyword that selects thread storage duration. An object with thread storage duration is not "a `static` that happens to be per-thread" — it is a distinct category with its own lifetime rule: exactly one instance is created per thread that touches it, and that instance's lifetime is bounded by the thread's lifetime, not the program's.
 
@@ -23,7 +23,7 @@ C++11 defines four storage durations: automatic, static, dynamic, and thread. `t
 
 The practical consequence: a `thread_local` variable behaves, from any single thread's point of view, exactly like a `static` variable — same address stability across calls, same "zero-initialized then constructed once" model. The difference only becomes visible when two threads read it and see different objects, or when you reason about _when_ those objects come into existence and go away.
 
-## 2. Where `thread_local` Can Be Applied
+## 2. Where `thread_local` can be applied
 
 `thread_local` can appear at namespace scope, as a `static` class data member, or as a function-local variable. It can also combine with `static` at namespace scope (the keywords are largely redundant there — namespace-scope names already have internal or external linkage independent of `static`) and it can combine with `const`/`constexpr`, though a `const thread_local` still gets one instance per thread; `const` doesn't collapse it into a shared read-only global.
 
@@ -53,7 +53,7 @@ The function-local form is the one worth pausing on, because it merges two guara
 
 **Thread-local function-static** (`thread_local Foo f;` inside a function) gives you one `Foo` _per thread_, and each thread's first call constructs its own instance independently. There's no cross-thread blocking because there's no cross-thread sharing to protect — each thread races only against itself, and a single thread cannot re-enter its own initialization concurrently. This is why `thread_local` function-statics are a common way to get per-thread caches, RNG state, or scratch allocators without any explicit locking: the compiler-generated guard variable is itself `thread_local`.
 
-## 3. Initialization Semantics
+## 3. Initialization semantics
 
 For namespace-scope and static-member `thread_local` objects, construction happens as part of thread startup, before any code in that thread runs that could observe the object — conceptually mirroring how namespace-scope `static` objects with dynamic initialization are constructed before `main` runs. The standard's ordering guarantees are the same ones you already know from `static` initialization order, just re-scoped to "per thread" instead of "per program":
 
@@ -64,7 +64,7 @@ This means a `thread_local` object's constructor must not depend on another `thr
 
 Function-local `thread_local` initialization is lazy per thread: the guard check happens on every entry to the declaring scope, and construction runs exactly once per thread, the first time control passes through the declaration on that thread. If that thread never executes the declaration, the object is never constructed and never destroyed — no wasted work, no dangling teardown.
 
-## 4. Destruction Semantics
+## 4. Destruction semantics
 
 `thread_local` objects are destroyed, in reverse order of completed construction, when the owning thread exits — before thread-specific storage is torn down by the underlying threading implementation, and before the thread's return value (for `std::thread`/`std::jthread`) or exit status is finalized. For the main thread, "thread exit" coincides with program termination, so main-thread `thread_local` objects are destroyed alongside ordinary `static` objects, interleaved by the same reverse-construction-order rule applied to that thread's construction sequence.
 
@@ -76,7 +76,7 @@ Two subtleties are worth flagging explicitly because they cause real bugs:
 
 At the implementation level, most platforms use a registration mechanism to make this work: on POSIX, glibc's TLS support layers on top of (or alongside) `pthread_key_create`'s per-key destructor callback, which the pthreads implementation invokes for each thread-specific key at thread exit; glibc's C++ runtime support (`__cxa_thread_atexit`/`__cxa_thread_atexit_impl`) registers each `thread_local` object's destructor to run at thread exit in a way that composes correctly with C++'s ordering rules, rather than relying solely on the coarser pthread key mechanism. This registration step is exactly where the `dlopen` problems in the next section originate.
 
-## 5. Cost Model: How TLS Access Actually Works
+## 5. Cost model: how TLS access actually works
 
 Every read or write of a `thread_local` variable is, underneath the language-level syntax, a lookup of "the copy of this variable belonging to the currently running thread." That lookup is not free, and its cost depends heavily on _how_ the variable's containing module was linked — this is governed by the ELF TLS access models (the same categorization applies conceptually on other platforms, with different names).
 
@@ -91,7 +91,7 @@ The general-dynamic model is the one the compiler must fall back to whenever it 
 
 In measured terms: local-exec access on a modern x86-64 Linux target is a handful of instructions — comparable to an ordinary global load — while a general-dynamic access is a full function call plus the work `__tls_get_addr` does internally to find the calling thread's copy of that module's TLS block. In a loop touching a `thread_local` millions of times, the difference between local-exec and general-dynamic is measurable; in code that touches it once per request, it's noise.
 
-## 6. `dlopen` and Shared-Library Pitfalls
+## 6. `dlopen` and Shared-Library pitfalls
 
 This is where `thread_local` stops being a self-contained language feature and starts depending on the dynamic linker's cooperation.
 
@@ -103,7 +103,7 @@ This is where `thread_local` stops being a self-contained language feature and s
 
 **Lazy binding and first-access cost spikes.** Because general-dynamic TLS access goes through a resolver function, the very first access to a `dlopen`'d module's `thread_local` variable — per thread — can be markedly slower than steady-state accesses, since it may need to allocate that thread's copy of the module's TLS block on demand. Systems sensitive to tail latency sometimes "warm" this by touching relevant `thread_local` state once per new thread at pool-creation time rather than waiting for it to happen inline with the first real request.
 
-## 7. The Thread-Pool Leakage Pattern
+## 7. The Thread-Pool leakage pattern
 
 The subtlest bug class doesn't involve the dynamic linker at all — it comes from a mismatch between "per-thread" and "per-task," which thread pools deliberately blur.
 
@@ -134,7 +134,7 @@ This pattern surfaces in a few recognizable shapes:
 2. **Wrap the pool's dispatch loop, not each task.** Put the reset logic in the pool's own "run one task" function so individual task authors can't forget it — this converts a per-call-site discipline problem into a one-time infrastructure fix.
 3. **Avoid `thread_local` for task-scoped data entirely where feasible.** If the data genuinely belongs to a task rather than a thread, threading it explicitly (a context object passed by reference, or `std::stack`-scoped state) is more verbose but structurally can't leak — there's no ambient state to forget to clear. `thread_local` is best reserved for state that's legitimately about the executing thread itself: scratch allocators, per-thread RNG streams, per-thread connection-pool checkout slots.
 
-## 8. Decision Matrix
+## 8. Decision matrix
 
 | Mechanism                                            | Scope of state                                 | Cleanup burden                                    | Best for                                                                                                                             |
 | ---------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |

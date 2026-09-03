@@ -10,7 +10,7 @@ If you've written modern C++ for any length of time, you've typed `noexcept` doz
 
 This article looks at what `noexcept` actually guarantees, where the real performance impact comes from, and — the main event — how it drives `std::vector`'s reallocation strategy through `std::move_if_noexcept`.
 
-## 1. What `noexcept` Actually Is
+## 1. What `noexcept` actually is
 
 `noexcept` shows up in two forms that are easy to conflate:
 
@@ -32,7 +32,7 @@ void wrapper(T& t) noexcept(noexcept(t.doSomething())) {
 
 This propagates the noexcept-ness of the wrapped call outward, which is exactly the mechanism the standard library leans on constantly — you'll see this shape in `std::swap`, in container move operations, in `std::optional`, and elsewhere.
 
-## 2. Performance Impact — Where It Actually Matters (and Where It Doesn't)
+## 2. Performance impact — where it actually matters (and where it doesn't)
 
 A common myth: "`noexcept` lets the compiler skip generating exception-handling machinery, so the function itself runs faster." This is mostly false for the function's own body. Most modern ABIs (notably the Itanium C++ ABI used by GCC/Clang) implement exceptions with a zero-cost model — there's no runtime overhead on the non-throwing path regardless of whether the function is `noexcept`. Marking a function `noexcept` typically does _not_ make its instructions run faster.
 
@@ -44,7 +44,7 @@ Where the real wins come from:
 
 So: `noexcept` is best understood as **metadata that changes decisions made by other code**, not a magic speed switch on the function itself.
 
-## 3. The Core Case: `std::vector` Reallocation and `move_if_noexcept`
+## 3. The core case: `std::vector` reallocation and `move_if_noexcept`
 
 This is where `noexcept` stops being a style preference and starts being a correctness-adjacent performance decision.
 
@@ -154,7 +154,7 @@ static_assert(std::is_nothrow_move_constructible_v<NoexceptMove>,
 
 This is a cheap, zero-runtime-cost guard worth putting near any type you specifically designed to be cheap to move.
 
-## 4. Practical Rule for User-Defined Types
+## 4. Practical rule for user-defined types
 
 **Mark move constructors and move assignment operators `noexcept` whenever they genuinely cannot throw** — which, for most types, means whenever the move operation is just transferring ownership of resources (pointers, handles, other movable members) without allocating, without doing I/O, without calling code that isn't itself noexcept.
 
@@ -168,20 +168,20 @@ Worth an explicit worked example: **implicitly generated move operations.** If y
 
 `std::string` itself is worth a footnote: its move constructor is `noexcept` per the standard, so it's not usually the culprit — but user types that hold raw owning resources with fallible cleanup logic often are.
 
-## 5. Other STL Touchpoints Worth Mentioning
+## 5. Other STL touchpoints worth mentioning
 
 - **`std::swap` and `noexcept(swap(...))`** — the standard `swap` for user types is conventionally written with a conditional noexcept that mirrors the noexcept-ness of the underlying move operations. `std::sort`, `std::vector::swap`, and various algorithms query this to decide their own exception-safety strategy, similar in spirit to the `move_if_noexcept` story.
 - **Destructors** — implicitly `noexcept(true)` unless you explicitly say otherwise. A throwing destructor is almost always a design bug: if it fires during stack unwinding from another exception, you get `std::terminate` immediately (two active exceptions can't coexist). Worth a short cautionary paragraph with an example of a destructor that closes a resource and "helpfully" throws on failure.
 - **`std::function`, `std::optional`, `std::variant`** — their move operations conditionally propagate the noexcept-ness of the type(s) they hold. `std::variant`'s case is particularly interesting (and a little painful) because of the valueless-by-exception state it can enter if a throwing move happens during certain operations — possibly worth a dedicated callout box rather than full treatment here.
 - **Allocator-aware containers** — allocator propagation traits (`propagate_on_container_move_assignment`, etc.) interact with noexcept-ness in ways that decide whether a container move assignment can itself be noexcept. This is deep enough to be its own short article rather than a subsection.
 
-## 6. Common Pitfalls
+## 6. Common pitfalls
 
 - **Lying to the compiler.** Marking a function `noexcept` when it can, in fact, throw (e.g., an allocation hides inside a "trivial-looking" move) doesn't produce a compile error — it produces a silent `std::terminate` at runtime, with a call stack that often looks nothing like the actual bug. This is one of the nastier categories of "worked in testing, crashed in production" bugs.
 - **Forgetting `noexcept` on a move constructor for a type destined to live in `std::vector`.** No compiler warning, no error — just an O(n) copy cascade on every growth that only shows up as "this is mysteriously slow" in a profiler.
 - **Pre-C++17 vs. post-C++17 semantics.** Before C++17, the exception specification wasn't part of the function's type, so `void(*)() noexcept` and `void(*)()` were compatible/interchangeable in more contexts. C++17 made the exception specification part of the function type, which affects function pointer assignment, template argument deduction, and overload resolution in subtle ways — worth a short before/after code sample.
 
-## 7. TL;DR — Should I Mark This `noexcept`?
+## 7. TL;DR — Should I mark this `noexcept`?
 
 A short decision checklist to close the article:
 

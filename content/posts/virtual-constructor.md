@@ -14,7 +14,7 @@ The reason is structural, not arbitrary. Virtual dispatch works by resolving a c
 
 So "virtual constructor" isn't a language feature. It's the name of a design idiom — a technique for getting constructor-like behavior (creating a new object) that is nonetheless dispatched polymorphically at runtime, based on an object's dynamic type.
 
-## 2. The Problem It Solves
+## 2. The problem it solves
 
 Consider a polymorphic hierarchy accessed only through a base pointer or reference:
 
@@ -41,7 +41,7 @@ You can't call `new Shape(s)` — `Shape` is abstract, and even if it weren't, t
 
 What you actually want is a _constructor selected by the object's runtime type_. Hence: virtual constructor.
 
-## 3. Implementation: The Clone Idiom
+## 3. Implementation: the clone idiom
 
 The standard implementation is the **clone idiom**: a virtual member function, conventionally named `clone()`, that each derived class overrides to construct a new instance of itself.
 
@@ -77,7 +77,7 @@ std::unique_ptr<Shape> duplicate(const Shape& s) {
 
 `clone()` itself does the "real" construction with `make_unique<Circle>(*this)`, using the compiler-generated (or user-defined) copy constructor of `Circle`. The virtual dispatch happens on `clone()` — an ordinary member function, fully legal to be `virtual` — and _inside_ that already-dispatched call, an ordinary, perfectly legal, non-virtual constructor runs on a fully-known concrete type. That's the trick: you don't make the constructor virtual, you make the _function that calls the constructor_ virtual.
 
-## 4. Implementation Variants
+## 4. Implementation variants
 
 ### 4.1 Covariant return types
 
@@ -121,7 +121,7 @@ struct Square : ClonableBase<Square, Shape> {
 
 Each derived class now writes zero clone-related code — `ClonableBase` generates a correct `clone()` for each `Derived` automatically, using the CRTP pattern to know, at compile time, exactly which concrete type it's constructing. This is the same technique covered in the earlier CRTP discussion on this blog, applied specifically to eliminate virtual-constructor boilerplate — a very common real-world use of CRTP alongside a `virtual` hierarchy, not instead of one.
 
-## 5. "Virtual Constructor" as a Generalization
+## 5. "Virtual Constructor" as a generalization
 
 `clone()` — a virtual _copy_ constructor — is the most common form, but the idiom generalizes further. The broader idea is: **any polymorphic creation of a new object, dispatched at runtime, without the caller knowing the concrete type.**
 
@@ -144,7 +144,7 @@ struct Circle : Shape {
 
 Both `clone()` and `create()` answer the same underlying question — "construct me one of whatever type this object actually is" — just with different initialization semantics (copy vs. default).
 
-## 6. Practical Applications
+## 6. Practical applications
 
 **Polymorphic containers.** `std::vector<std::unique_ptr<Shape>>` is a common pattern discussed on this blog before, but copying such a container is nontrivial — `vector`'s copy constructor can't just copy `unique_ptr`s (they're move-only), and even if it could, a shallow pointer copy would share ownership incorrectly. `clone()` is exactly what you need to implement a correct deep-copying container of polymorphic objects:
 

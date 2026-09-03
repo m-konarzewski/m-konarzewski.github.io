@@ -16,7 +16,7 @@ This is the problem type erasure solves. It's not a language feature — there's
 
 If you've read the earlier post on static vs. dynamic polymorphism, type erasure will feel familiar in its mechanics: it uses `virtual` dispatch internally. But the way it's _packaged_ — and the guarantees it gives the caller — are different enough to deserve their own treatment.
 
-## 2. The Canonical Example: `std::function`
+## 2. The canonical example: `std::function`
 
 You've used type erasure already, whether you knew it or not. `std::function<R(Args...)>` is the standard library's flagship type-erased wrapper.
 
@@ -34,11 +34,11 @@ Three completely unrelated types — a lambda closure, a functor, a function poi
 
 That's the essence of type erasure: **the concrete type is known at the point of construction, and forgotten immediately after.** From that point on, the wrapper interacts with the object exclusively through a fixed, type-independent interface.
 
-## 3. Anatomy of the Mechanism
+## 3. Anatomy of the mechanism
 
 Every type-erased wrapper, `std::function` included, is built from the same three ingredients.
 
-### 3.1 The Concept/Model idiom
+### 3.1 The concept/model idiom
 
 This is the classic "external polymorphism" trick, sometimes attributed to Sean Parent's "Inheritance Is The Base Class of Evil" talk. You define a small abstract interface (the _Concept_) describing the operations you need:
 
@@ -93,7 +93,7 @@ The naive implementation above heap-allocates a `Model<T>` for every object, via
 
 The standard library avoids this for small objects using **Small Buffer Optimization (SBO)**: the wrapper reserves a fixed-size inline buffer (commonly 16–32 bytes, implementation-defined) and placement-constructs the `Model<T>` there if it fits, falling back to heap allocation only for larger types. This is why capturing a large `std::array` in a lambda passed to `std::function` can suddenly trigger heap allocations, while a lambda with one or two captured pointers stays purely on the stack.
 
-## 4. Implementation From Scratch
+## 4. Implementation from scratch
 
 Let's build a minimal, from-scratch type-erased wrapper for "anything drawable" — no inheritance required on the user's part.
 
@@ -148,7 +148,7 @@ Note the `Concept`/`Model` classes live _inside_ `Drawable` as private nested ty
 
 `std::any` is essentially this same pattern, minus the `draw()` operation — its `Concept` interface only needs to support querying the type (`std::type_info`) and copying/destroying the held value.
 
-## 5. Costs and Pitfalls
+## 5. Costs and pitfalls
 
 Type erasure isn't free, and its costs are easy to overlook because the syntax hides them so well.
 
@@ -169,7 +169,7 @@ Reaching for `any_cast` frequently is usually a sign that type erasure was the w
 
 **Object lifetime and slicing-adjacent bugs.** Because the wrapper owns storage for the model, dangling references into an erased object are easy to create if you're not careful about whether the wrapper stores a value, a reference, or a pointer. `std::function` capturing a reference to a local that goes out of scope is a classic dangling-reference bug dressed up in type-erasure clothing.
 
-## 6. When to Use It, and When Not To
+## 6. When to use it, and when not to
 
 Reach for type erasure when:
 

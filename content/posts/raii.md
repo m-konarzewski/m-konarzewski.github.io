@@ -14,7 +14,7 @@ This works in C++ because object destruction is deterministic. A local variable'
 
 If you've followed the recent posts here on the Rule of Zero, `unique_ptr`, and `noexcept`-qualified move construction, you've already been using RAII — those posts were all, in different ways, applications of this one underlying idea. This post is the foundational piece they were all quietly assuming.
 
-## 2. The Mechanism: The Destructor as a Guarantee
+## 2. The mechanism: The destructor as a guarantee
 
 The core guarantee RAII relies on is this: **when a scope exits — normally, via `return`, `break`, or falling off the end of a block, or abnormally, via an exception propagating through it — every fully-constructed local object with automatic storage duration has its destructor called, in reverse order of construction.** This process, when it happens due to exception propagation, is called **stack unwinding**.
 
@@ -30,7 +30,7 @@ If `risky_operation()` throws, execution doesn't fall through to the closing bra
 
 One detail worth flagging explicitly, since it interacts directly with unwinding: destructors are implicitly `noexcept` by default (as covered in more depth in the earlier `noexcept` post). This matters _especially_ here — if a destructor threw while the stack was already unwinding due to a different, in-flight exception, the language would have two simultaneous exceptions with no sane way to resolve which one propagates, and the standard's answer is `std::terminate()`. RAII's release logic living in destructors, combined with destructors being expected not to throw, is what keeps stack unwinding a safe, well-defined operation rather than a potential crash site.
 
-## 3. RAII Beyond Memory
+## 3. RAII beyond memory
 
 It's easy to think of RAII as "the thing `unique_ptr` does," but memory is genuinely just the most common case, not a special one. The same pattern — acquire in constructor, release in destructor — applies to any resource with a distinct acquire/release pair:
 
@@ -56,7 +56,7 @@ It's easy to think of RAII as "the thing `unique_ptr` does," but memory is genui
 
 `std::ifstream`/`std::ofstream` closing their underlying file descriptor, `std::lock_guard`/`std::unique_lock`/`std::scoped_lock` releasing a mutex, a database transaction wrapper rolling back on an unhandled exception path, a network connection wrapper closing a socket, a timer or profiling scope logging elapsed time on exit — these are all the identical idiom applied to different resource types. Once you see RAII as "resource lifetime management," rather than "the mechanism behind smart pointers specifically," you start recognizing it as the default answer to almost every acquire/release problem in C++, not a niche memory-management trick.
 
-## 4. Implementing a Custom RAII Wrapper
+## 4. Implementing a custom RAII wrapper
 
 Let's build one from scratch: a wrapper around a POSIX file descriptor.
 
@@ -101,7 +101,7 @@ Every point here connects to something already covered: the constructor acquires
 
 The result: `FileDescriptor` can now be used exactly like `std::ifstream` in Section 3 — opened, used, and automatically closed on any exit path, without a single explicit `close()` call anywhere in client code.
 
-## 5. Scope Guards: Generalized RAII
+## 5. Scope guards: Generalized RAII
 
 Sometimes you don't want to define an entire class just to guarantee one bit of cleanup runs at scope exit — you want to attach arbitrary code to "run this when we leave, no matter how." That's exactly what a **scope guard** does: a generic RAII type that wraps a callable instead of a specific resource.
 
@@ -142,7 +142,7 @@ void update_config() {
 
 This is the same idiom as `std::unique_ptr` with a custom deleter, generalized one step further: instead of "release a specific resource," it's "run this closure." The standard library doesn't (as of C++20) ship a standard scope guard, though `std::experimental::scope_exit` exists in the Library Fundamentals TS and several major libraries (Boost, GSL, Abseil) provide their own equivalents — the pattern above is small enough that many codebases simply write their own rather than take a dependency for it.
 
-## 6. RAII and Exception Safety
+## 6. RAII and exception safety
 
 RAII's biggest practical payoff is that it gives you exception safety largely **for free**, without manual `try`/`catch`/cleanup bookkeeping. Compare the pre-RAII, C-style approach to resource cleanup under error conditions:
 

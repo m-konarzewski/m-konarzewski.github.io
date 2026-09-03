@@ -1,7 +1,7 @@
 +++ 
 draft = false
 date = 2026-08-28T10:31:50+02:00
-title = "Audio Fundamentals & A/V Sync"
+title = "Audio fundamentals & A/V Sync"
 tags = ["Audio", "Sync", "PTS", "DTS"]
 categories = ["Video Streaming"]
 +++

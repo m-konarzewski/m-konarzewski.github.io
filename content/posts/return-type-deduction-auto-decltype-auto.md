@@ -6,13 +6,11 @@ tags = ["C++", "auto", "decltype", "type-deduction"]
 categories = ["C++"]
 +++
 
-# Return Type Deduction: When to Use `auto` vs `decltype(auto)`
-
 C++14 gave us two ways to let the compiler deduce a function's return type: `auto` and `decltype(auto)`. On the surface they look almost interchangeable — both let you drop an explicit return type and let the compiler figure it out from the `return` statement. In practice, they follow completely different deduction rules, and picking the wrong one is a reliable way to introduce a dangling reference, silently strip `const`, or break a perfect-forwarding wrapper in a way that only shows up under `-O2` or with a specific compiler.
 
 This article goes deep into both mechanisms, with enough examples that you should never have to guess again.
 
-## 1. The Core Problem in One Example
+## 1. The core problem in one example
 
 Consider this pair of functions:
 
@@ -39,7 +37,7 @@ Same function body, same expression in the `return` statement, radically differe
 
 Neither behavior is "wrong." Each is correct _for what it does_. The point of this article is to make sure you know, before you write the function, which one you're asking for.
 
-## 2. `auto` Return Type Deduction: Template Argument Deduction Rules
+## 2. `auto` return type deduction: Template argument deduction rules
 
 When you write:
 
@@ -129,7 +127,7 @@ auto pick_ok(bool flag) {
 
 This is a genuinely useful compiler check — it catches accidental type drift across branches that you might not notice with an explicit `auto` disguising two different numeric types.
 
-## 3. `decltype(auto)`: `decltype(expr)` Rules
+## 3. `decltype(auto)`: `decltype(expr)` rules
 
 When you write:
 
@@ -224,7 +222,7 @@ So both statements are simultaneously true: the function's declared type is `int
 
 That's the rule responsible for everything demonstrated above: it applies the moment `get_limit()` is evaluated as a call expression (a prvalue of scalar type), regardless of what `const`-ness is nominally recorded in the function's own declared type.
 
-## 4. The Classic Pitfall: Parentheses Change Everything
+## 4. The classic pitfall: Parentheses change everything
 
 This is the single most-cited gotcha with `decltype(auto)`, and it comes directly from how `decltype` treats its operand:
 
@@ -267,7 +265,7 @@ decltype(auto) get_value_correct(Widget w) {
 
 `w` is a parameter passed by value; it's a local object that's destroyed when the function returns. `get_value_buggy` wraps `w.value` in parentheses, which under `decltype`'s rules makes it an lvalue expression, deducing `int&` — a reference into a parameter that's already gone by the time the caller gets it.
 
-## 5. Where `decltype(auto)` Is Genuinely Necessary: Perfect-Forwarding Wrappers
+## 5. Where `decltype(auto)` is genuinely necessary: Perfect-Forwarding wrappers
 
 This is the motivating use case for `decltype(auto)`'s existence: writing a generic wrapper function that calls some other function and needs to forward back _exactly_ what that function returned — same type, same reference-ness, same constness — without knowing in advance what that is.
 
@@ -332,7 +330,7 @@ int main() {
 
 `access` has no idea, at the point it's written, whether `T` will be `Config&` or `const Config&`. `decltype(auto)` correctly propagates whichever `at()` overload actually gets called — mutable reference or const reference — without the author needing to write two overloads by hand.
 
-## 6. The Dangling Reference Trap, In Depth
+## 6. The dangling reference trap, in depth
 
 Section 4 showed the parentheses trap. But `decltype(auto)` can dangle even _without_ parentheses, any time the returned expression's declared type is itself a reference to something local.
 
@@ -375,7 +373,7 @@ decltype(auto) get_first_broken() {
 
 Same root cause as Section 4, just wearing a structured-bindings costume. The lesson generalizes: **any time `decltype(auto)` deduces a reference type, ask yourself what that reference refers to, and whether it outlives the function call.**
 
-## 7. Historical Context: Trailing `decltype` Before C++14
+## 7. Historical context: Trailing `decltype` before C++14
 
 Before C++14 introduced `decltype(auto)`, if you wanted to write a function template whose return type depended on an expression involving its own parameters, you had to use a **trailing return type** with `decltype`, because in the function's parameter scope the parameters aren't visible yet at the point where a leading return type would normally go:
 
@@ -418,7 +416,7 @@ Trailing return types with explicit `decltype` are still useful today, though, f
 - **If a function has an explicit, known reference return type**, just write it explicitly (`int& foo();`) instead of relying on deduction at all. Deduction is for when the type is genuinely dependent on template parameters or otherwise non-obvious; it's not a style preference for ordinary functions.
 - **If branches return genuinely different types**, neither `auto` nor `decltype(auto)` unifies them — you need an explicit common type, `std::variant`, or a base-class pointer/reference.
 
-## 9. Comparison Table
+## 9. Comparison table
 
 | Aspect                            | `auto`                                              | `decltype(auto)`                                                                               |
 | --------------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
@@ -432,7 +430,7 @@ Trailing return types with explicit `decltype` are still useful today, though, f
 | Typical use case                  | General-purpose default; most functions             | Generic forwarding wrappers preserving exact return semantics                                  |
 | Pre-C++14 equivalent              | N/A (new in C++14 for functions)                    | Trailing `-> decltype(expr)`                                                                   |
 
-## 10. Closing Thoughts
+## 10. Closing thoughts
 
 `auto` and `decltype(auto)` are not two flavors of "let the compiler figure it out" — they encode two different philosophies about what a return type deduction should optimize for. `auto` optimizes for safety and simplicity: you get a value, full stop, and the compiler stops you if your branches disagree. `decltype(auto)` optimizes for fidelity: you get _exactly_ the type and value category of the expression you wrote, parentheses and all, which is exactly what a forwarding wrapper needs and exactly what makes it easy to shoot yourself in the foot everywhere else.
 

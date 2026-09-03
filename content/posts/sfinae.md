@@ -12,7 +12,7 @@ SFINAE stands for "Substitution Failure Is Not An Error." It's a small, precise 
 
 It wasn't designed as a feature in the way `virtual` or `constexpr` were designed. It's closer to a fortunate consequence of how template argument deduction was specified, that library authors noticed could be exploited deliberately. Understanding _why_ it exists requires understanding what problem it accidentally, then deliberately, solved: how do you let the compiler silently discard a candidate function template from overload resolution, instead of hard-failing the entire compilation, when that candidate doesn't make sense for a particular type?
 
-## 2. The Basic Mechanism
+## 2. The basic mechanism
 
 When the compiler resolves an overloaded call involving function templates, it has to substitute the deduced (or explicitly specified) template arguments into each candidate's signature to see if it's viable. SFINAE's rule is this: **if that substitution produces an invalid type or expression _in the function's immediate context_ — the declaration itself, not its body — that candidate is silently removed from the overload set, rather than triggering a compilation error.**
 
@@ -48,7 +48,7 @@ void also_broken(T x) {
 
 Getting this distinction wrong is the single most common source of "why isn't SFINAE working here" bugs.
 
-## 3. Classic SFINAE Idioms
+## 3. Classic SFINAE idioms
 
 ### 3.1 `std::enable_if` / `std::enable_if_t`
 
@@ -112,7 +112,7 @@ struct has_value_type<T, std::void_t<typename T::value_type>> : std::true_type {
 
 The second, partial specialization only matches when `typename T::value_type` is a valid substitution — if it isn't, SFINAE quietly falls back to the primary template, `false_type`. This pattern — known as the **detection idiom** — generalizes to detecting the presence of essentially any member type, member function, or valid expression on `T`, and is the backbone of most hand-rolled type traits written before C++20 concepts existed.
 
-## 4. Example: Implementing a Custom Type Trait
+## 4. Example: implementing a custom type trait
 
 Let's build `has_to_string<T>` from scratch — a trait that detects whether `T` has a callable `to_string()` member function.
 
@@ -149,7 +149,7 @@ static_assert(!has_to_string_v<Raw>);
 
 This trait can now gate an `enable_if`-based overload, letting you write a `log()` function that calls `.to_string()` when available and falls back to a generic representation otherwise — the two idioms compose directly.
 
-## 5. SFINAE and Overload Resolution
+## 5. SFINAE and overload resolution
 
 It's worth being explicit that SFINAE doesn't _choose_ between candidates — it only _removes_ candidates that would otherwise be hard errors. Once SFINAE has pruned the overload set, ordinary overload resolution rules — best match, most specialized template, non-template preferred over template on an exact tie — take over exactly as they would without SFINAE involved at all.
 
@@ -157,7 +157,7 @@ This has a subtle but important consequence: SFINAE can accidentally _create_ am
 
 The other pitfall worth flagging: SFINAE only sees the _immediate context of substitution_, which specifically excludes **non-deduced contexts** — places where a template parameter appears but can't be deduced from the function arguments, such as the left side of a `::` scope resolution buried inside a dependent, already-resolved alias. Errors surfacing from a non-deduced context, or from a nested template instantiation the compiler has to fully materialize before it can check well-formedness, tend to become hard errors rather than clean SFINAE exclusions — which is precisely why some `enable_if` usage that "looks right" still produces a wall of compiler diagnostics instead of a silent overload removal.
 
-## 6. Pitfalls and Limitations
+## 6. Pitfalls and limitations
 
 **Unreadable error messages.** When SFINAE fails to find _any_ viable overload — as opposed to successfully excluding one — the compiler reports every rejected candidate and why, producing the notoriously enormous template error walls C++ is famous for. A failed `enable_if` condition often surfaces as "no matching function for call" followed by a dozen lines of substitution failure detail per candidate, rather than a single clear message pointing at your actual mistake.
 
@@ -167,7 +167,7 @@ The other pitfall worth flagging: SFINAE only sees the _immediate context of sub
 
 **Verbosity and boilerplate.** Every one of the idioms above — `enable_if` placement, `void_t` detection specializations, `declval`-based expression tests — is boilerplate that exists purely to work around SFINAE's syntax, not to express the actual intent ("only participate if `T` supports X"). This verbosity is precisely the motivation for what replaced it.
 
-## 7. Why C++20 `requires` Largely Replaces Manual SFINAE
+## 7. Why C++20 `requires` largely replaces manual SFINAE
 
 The earlier post on this blog about tag dispatch vs. `if constexpr`/SFINAE/concepts covered the mechanics of `requires` clauses directly, so this is deliberately brief: C++20 concepts let you express "only participate if `T` supports X" as a `requires` clause stating the requirement directly, instead of manufacturing a substitution failure as a side effect to achieve the same result. The `has_to_string` trait built by hand in Section 4 becomes a one-line `requires` expression, and — just as importantly — a failed `requires` clause produces a targeted diagnostic naming the exact unsatisfied requirement, instead of a wall of substitution-failure noise across every rejected candidate.
 

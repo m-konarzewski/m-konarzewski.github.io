@@ -7,7 +7,7 @@ tags = ["C++", "C++20", "Tag dispatch", "Concepts", "SFINAE", "Templates"]
 categories = ["C++"]
 +++
 
-## 1. Introduction — What Problem Are We Solving?
+## 1. Introduction — what problem are we solving?
 
 Every non-trivial C++ codebase eventually runs into the same question: _how do I select a different implementation depending on the type I'm working with, without paying for that decision at runtime?_
 
@@ -17,7 +17,7 @@ This is where **tag dispatch** enters the picture. It's one of the oldest metapr
 
 A good way to feel the problem before seeing the solution: imagine you're implementing your own version of `std::advance`. For a `std::vector<int>::iterator`, advancing by `n` is a single pointer addition — O(1). For a `std::list<int>::iterator`, there's no such shortcut; you must walk the list node by node — O(n). The _algorithm itself_ has to change based on the iterator's capabilities, and those capabilities are a compile-time property of the type. This is exactly the kind of problem tag dispatch was built for, and it's the running example we'll use throughout this article — tying back to the iterator category discussion from earlier in this series.
 
-## 2. The Mechanics of Tag Dispatch — How It Actually Works
+## 2. The mechanics of tag dispatch — how it actually works
 
 At its core, tag dispatch is nothing more than **function overloading driven by an empty marker type**. Strip away the STL ceremony and you get something almost embarrassingly simple.
 
@@ -165,7 +165,7 @@ void advance_impl(It& it, Distance n) { /* ... */ }
 
 This is, in a real sense, tag dispatch with the tag _inferred_ rather than _materialized_ — the compiler figures out which constraint the type satisfies instead of you computing a tag object and passing it explicitly. You get the same overload-resolution machinery, but with vastly better error messages (concepts report _which constraint_ failed, not a cascade of substitution failures) and no boilerplate tag hierarchy.
 
-### Summary Table
+### Summary table
 
 | Technique            | Compile-time cost | Error message quality                 | Best for                                                                                    |
 | -------------------- | ----------------- | ------------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -174,7 +174,7 @@ This is, in a real sense, tag dispatch with the tag _inferred_ rather than _mate
 | SFINAE (`enable_if`) | High              | Poor (substitution failure walls)     | Legacy code; pre-C++20 constrained overloads                                                |
 | Concepts             | Low               | Excellent (named constraint failures) | New code, C++20+, public API boundaries                                                     |
 
-## 5. When Tag Dispatch Still Earns Its Place in C++20
+## 5. When tag dispatch still earns its place in C++20
 
 Given `if constexpr` and concepts, is tag dispatch obsolete? Not quite. A few scenarios still favor it.
 
@@ -194,7 +194,7 @@ While concepts generally win on error message clarity, tag dispatch still beats 
 
 Tag-dispatched functions are ordinary free functions, discoverable via argument-dependent lookup. This means a user-defined type can participate in a dispatch scheme defined in a completely different namespace, simply by ensuring the right tag type is associated with their type — the same mechanism that makes `swap` customization points work.
 
-## 6. Pitfalls and Good Practices
+## 6. Pitfalls and good practices
 
 Like any overload-based technique, tag dispatch has sharp edges.
 

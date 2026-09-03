@@ -10,7 +10,7 @@ categories = ["C++"]
 
 `std::unique_lock` is the more flexible sibling of `std::lock_guard`: both are RAII wrappers around a mutex — the same idiom covered in depth in the earlier post on RAII, applied specifically to `lock()`/`unlock()` as the acquire/release pair — but `unique_lock` trades a small amount of overhead for a much larger set of capabilities. Where `lock_guard` does exactly one thing (lock on construction, unlock on destruction, nothing else), `unique_lock` can defer locking, attempt it without blocking, adopt a lock someone else already took, unlock and relock mid-scope, and be moved out of a function. Three tag types — `std::defer_lock`, `std::try_to_lock`, and `std::adopt_lock` — control exactly what happens at construction time, and this post works through each one.
 
-## 2. Default Construction: Lock Immediately
+## 2. Default construction: lock immediately
 
 The default behavior mirrors `lock_guard` exactly:
 
@@ -99,7 +99,7 @@ std::scoped_lock lock(mtx_a, mtx_b);
 
 `scoped_lock` takes any number of mutexes directly in its constructor and internally applies the same deadlock-avoidance algorithm `std::lock()` uses, with no separate `defer_lock` dance required. Reach for `unique_lock` with `defer_lock` specifically when you need the resulting lock objects to individually support the extra `unique_lock` capabilities from Section 7 below (moving one out, unlocking mid-scope) — otherwise `scoped_lock` says exactly what you mean with less code.
 
-## 7. Flexibility Beyond Construction
+## 7. Flexibility beyond construction
 
 The capabilities that justify `unique_lock`'s extra overhead over `lock_guard` mostly show up _after_ construction, not at it. `unique_lock` exposes `lock()`, `unlock()`, and `try_lock()` as ordinary member functions, meaning you can release and reacquire the mutex within the same scope:
 

@@ -48,7 +48,7 @@ These two — `tuple_size` and `tuple_element` — are the traits that let gener
 
 With that foundation in place, on to the four main utilities.
 
-## 2. `std::forward_as_tuple`: Building a Tuple of References Without Copying
+## 2. `std::forward_as_tuple`: building a tuple of references without copying
 
 `std::forward_as_tuple(args...)` constructs a `std::tuple` whose element types are exactly the forwarding-reference types of its arguments — `T&&` for each argument, deduced the same way a forwarding reference parameter would deduce. Critically, **it does not copy or move anything**; it just packages references.
 
@@ -80,7 +80,7 @@ auto by_value = std::make_tuple(x, y, std::string("temporary"));
 
 `std::forward_as_tuple`, by contrast, never decays and never copies — every element is a reference. This means the resulting tuple's validity is bound entirely to the lifetime of whatever it references, which is the central thing to keep in mind whenever you use it: **a tuple built by `forward_as_tuple` should be consumed immediately, in the same full expression, not stored.**
 
-## 3. `std::piecewise_construct`: In-Place Construction of `std::pair` Members
+## 3. `std::piecewise_construct`: In-Place Construction of `std::pair` members
 
 This is the canonical use case that makes `std::forward_as_tuple` worth learning. `std::pair` (and by extension `std::map`, `std::unordered_map`, and any container storing pairs) has a constructor overload:
 
@@ -198,7 +198,7 @@ std::pair<std::string, Point> p(std::piecewise_construct,
 
 `std::make_tuple` also works here in place of `std::forward_as_tuple`, but it defeats part of the purpose — it copies/decays its arguments into the intermediate tuple before that tuple's contents get forwarded onward. For anything beyond trivially-copyable scalars, `std::forward_as_tuple` is the right choice specifically because it avoids that intermediate copy.
 
-## 4. `std::tie`: Unpacking, Assignment, and Lexicographic Comparison
+## 4. `std::tie`: Unpacking, assignment, and lexicographic comparison
 
 `std::tie(args...)` constructs a `std::tuple` of **lvalue references** to its arguments — always `T&`, never `T&&`, regardless of what you pass (unlike `forward_as_tuple`, which preserves value category). This makes `std::tie` fundamentally about _assigning into_ existing variables, not packaging arguments for construction.
 
@@ -266,7 +266,7 @@ struct Employee {
 
 `std::tuple`'s relational operators are defined lexicographically — compare the first elements; if they differ, that's the result; if they're equal, move to the second element; and so on. Writing this by hand for three or more fields is exactly the kind of code that's easy to get subtly wrong (a classic bug: comparing the same field twice, or forgetting a field entirely in a later refactor). `std::tie` turns a three-way cascading comparison into one expression, and because it ties _references_ rather than copies, this has no meaningful runtime overhead over the hand-written version — it typically compiles down to the same instructions.
 
-## 5. `std::tuple_cat`: Concatenating Multiple Tuples
+## 5. `std::tuple_cat`: concatenating multiple tuples
 
 `std::tuple_cat(t1, t2, ..., tn)` takes any number of tuples (or tuple-like types, including `std::pair` and `std::array`) and concatenates them into a single tuple containing all of their elements, in order.
 
@@ -312,7 +312,7 @@ Notice `flatten` combines two of our four utilities: it forwards its parameter p
 
 Because `tuple_cat` genuinely copies or moves every element into a freshly-constructed tuple, chaining several `tuple_cat` calls (`tuple_cat(tuple_cat(a, b), c)`) can be more expensive than it looks at a glance — although a good compiler will typically fold a chain like that into a single concatenation via inlining and RVO/copy-elision for the intermediate tuple, so measure before assuming this is a bottleneck rather than assuming pessimistically. When element types are expensive to move (heap-owning types without a cheap move constructor, or types with no move constructor at all, forcing a copy), the cost is real per-element, not per-call — that's the more relevant thing to keep an eye on, not the number of `tuple_cat` invocations itself.
 
-## 6. Where `std::tie` Does _Not_ Improve Performance — A Common Myth
+## 6. Where `std::tie` Does _Not_ improve performance — a common myth
 
 It's worth being explicit about a misconception that circulates: `std::tie` for unpacking a `pair`/`tuple` is **not** a performance optimization over structured bindings, and treating it as one is a category error. Both are, at the machine-code level, typically doing the same or extremely similar work — binding names (or references) to the elements of an existing aggregate.
 
@@ -327,7 +327,7 @@ auto [a2, b2] = compute();
 
 The actual, meaningful difference between these two is **not speed** — it's that `std::tie` assigns into variables that already exist (useful inside a loop, where you don't want to redeclare `a` and `b` on every iteration, or where you need `a` and `b` to outlive the binding and be reused later), while structured bindings always _introduce_ new variables scoped to the binding. Reach for `std::tie` when you need the "assign into existing variables" behavior specifically — not because it's faster than the alternative, because in the general case it isn't.
 
-## 7. C++17 and Later: What Changed, and What Didn't
+## 7. C++17 and Later: what changed, and what didn't
 
 C++17 introduced structured bindings, which cover a large fraction of what `std::tie` used to be needed for — namely, pulling a tuple or pair apart into named pieces at the point of declaration:
 
@@ -356,7 +356,7 @@ What did **not** get a replacement: `std::piecewise_construct` and `std::forward
 
 `std::tie`'s lexicographic-comparison use case (Section 4.3) also has no structured-bindings replacement — structured bindings only destructure, they don't build comparable proxies — so that idiom remains fully current, and you'll still see it in modern codebases, including ones that otherwise lean heavily on C++17/20 features.
 
-## 8. Decision Table
+## 8. Decision table
 
 | Utility                    | What it produces                                                       | Copies/moves elements?                                        | Primary use case                                                                                                                                          |
 | -------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |

@@ -6,8 +6,6 @@ tags = ["video", "video streaming", "video fundamentals", "codecs", "compression
 categories = ["video-streaming"]
 +++
 
-# What Is a Video, Really? The Fundamentals Before We Talk About Streaming
-
 Before diving into protocols, codecs, and video pipeline optimizations, it's worth stepping back and answering a question that sounds trivial but is rarely addressed head-on: **what is a video file, really?**
 
 The question seems obvious — we all watch videos every day. But try to answer it precisely: what exactly happens between the moment a camera captures a scene and the moment you see it on your phone screen, delivered over the internet in a fraction of a second? The answer runs through several layers of abstraction, each solving a distinct engineering problem. Understanding these layers — individually and in relation to each other — is the foundation without which it's hard to meaningfully discuss streaming, compression, or image quality.
