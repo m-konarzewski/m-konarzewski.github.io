@@ -1,5 +1,5 @@
 +++ 
-draft = true
+draft = false
 date = 2026-09-10T14:24:43+02:00
 title = "User space vs. kernel space"
 tags = ["linux", "user-space", "kernel-space", "syscalls"]
