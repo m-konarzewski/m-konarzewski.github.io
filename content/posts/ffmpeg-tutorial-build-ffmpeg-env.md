@@ -71,17 +71,13 @@ set -e
     --enable-pthreads \
     --enable-pic \
     --enable-rpath \
-    \
     --enable-lto \
     --optflags="-O3 -march=native -mtune=native" \
-    \
     --disable-debug \
     --disable-static \
     --enable-shared \
-    \
     --enable-gpl \
     --enable-nonfree \
-    \
     --enable-network \
     --enable-protocol=rtp \
     --enable-protocol=tcp \
@@ -92,37 +88,29 @@ set -e
     --enable-demuxer=rtsp \
     --enable-demuxer=dash \
     --enable-muxer=rtsp \
-    \
     --enable-cuda-nvcc \
     --enable-cuda \
     --enable-ffnvcodec \
     --extra-cflags="-I/usr/local/cuda/include" \
     --extra-ldflags="-L/usr/local/cuda/lib64" \
-    \
     --enable-nvenc \
     --enable-nvdec \
-    \
     --enable-filter=scale_cuda \
     --enable-filter=overlay_cuda \
     --enable-filter=hwupload_cuda \
     --enable-filter=hwdownload \
     --enable-filter=hwmap \
-    \
     --enable-filter=drawtext \
     --enable-libass \
     --enable-libfreetype \
     --enable-libfontconfig \
     --enable-libharfbuzz \
-    \
     --enable-libmp3lame \
     --enable-libvorbis \
-    \
     --enable-libx264 \
     --enable-libx265 \
     --enable-libvpx \
-    \
     --enable-libxml2 \
-    \
     --logfile=ffmpeg_config.log
 ```
 
@@ -139,19 +127,14 @@ set -e
     --enable-pthreads \
     --enable-pic \
     --enable-rpath \
-    \
     --optflags="-O3 -march=native -mtune=native" \
     --enable-lto \
-    \
     --disable-static \
     --enable-shared \
-    \
     --enable-gpl \
     --enable-nonfree \
-    \
     --enable-network \
     --enable-openssl \
-    \
     --enable-protocol=http \
     --enable-protocol=https \
     --enable-protocol=rtp \
@@ -161,22 +144,17 @@ set -e
     --enable-demuxer=dash \
     --enable-demuxer=rtsp \
     --enable-muxer=rtsp \
-    \
     --enable-filter=drawtext \
     --enable-libass \
     --enable-libfreetype \
     --enable-libfontconfig \
     --enable-libharfbuzz \
-    \
     --enable-libmp3lame \
     --enable-libvorbis \
-    \
     --enable-libx264 \
     --enable-libx265 \
     --enable-libvpx \
-    \
     --enable-libxml2 \
-    \
     --logfile=ffmpeg_config.log
 ```
 
@@ -220,7 +198,7 @@ The first command confirms the binary picked up your build (check the configurat
 
 ## Where to find the code
 
-The full set of lessons for this series lives in the companion repository: [FFmpeg-tutorial](https://github.com/m-konarzewski/FFmpeg-tutorial). Clone it and build following the instructions in that repo.
+The full set of lessons for this series lives in the companion repository: [FFmpeg-tutorial](https://github.com/m-konarzewski/FFmpeg-tutorial). Clone it and build following the instructions in that repo. Our FFmpeg tutorial relies on the SDL library which will be used across the tutorial mainly to render graphics on your screen.
 
 The quick step by step commands:
 
