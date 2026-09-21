@@ -1,7 +1,7 @@
 +++ 
 draft = false
 date = 2026-09-18T15:43:22+02:00
-title = "Lesson 1: Building the FFmpeg development environment"
+title = "Lesson 1 - Building the FFmpeg development environment"
 tags = ["build", "compile", "nvidia"]
 categories = ["FFmpeg"]
 +++
