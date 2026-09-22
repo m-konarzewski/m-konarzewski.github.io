@@ -156,6 +156,8 @@ The cleanup counterpart to `avformat_open_input`: it frees the `AVFormatContext`
 ```cpp
 extern "C" {
 #include <libavformat/avformat.h>
+#include <libavutil/pixdesc.h>
+#include <libavutil/samplefmt.h>
 }
 
 #include <format>
