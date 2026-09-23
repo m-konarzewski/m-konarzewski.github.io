@@ -1,7 +1,7 @@
 +++ 
 draft = false
 date = 2026-09-23T02:14:52+02:00
-title = "Lesson 4 - Keyframes, GOPs, and Timestamps: The Vocabulary Before Decoding"
+title = "Lesson 4 - Keyframe, GOP, timestamps: Vocabulary before decoding"
 tags = ["keyframe", "GOP", "pts", "dts", "timebase", "framerate"]
 categories = ["FFmpeg"]
 +++
