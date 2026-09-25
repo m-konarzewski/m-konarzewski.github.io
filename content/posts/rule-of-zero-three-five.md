@@ -1,7 +1,7 @@
 +++ 
 draft = false
 date = 2026-08-08T09:11:10+02:00
-title = "The Rule of Zero, Three, and Five"
+title = "The Rule of zero, three, and five"
 tags = ["C++", "RAII", "rule-of-zero", "rule-of-three", "rule-of-five"]
 categories = ["C++"]
 +++

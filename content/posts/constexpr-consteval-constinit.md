@@ -1,7 +1,7 @@
 +++ 
 draft = false
 date = 2026-09-03T11:00:30+02:00
-title = "constexpr vs consteval vs constinit: Compile-Time Guarantees in C++20/23/26"
+title = "constexpr vs consteval vs constinit: Compile-time guarantees in C++20/23/26"
 tags = ["constexpr", "consteval", "constinit"]
 categories = ["C++"]
 +++

@@ -1,7 +1,7 @@
 +++ 
 draft = false
 date = 2026-08-18T10:02:26+02:00
-title = "std::unique_lock and Its Three Construction Tags"
+title = "std::unique_lock and its three construction tags"
 tags = ["C++", "unique-lock", "tags", "mutex"]
 categories = ["C++"]
 +++

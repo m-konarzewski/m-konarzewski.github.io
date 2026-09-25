@@ -106,18 +106,48 @@ Capturing `self` (not `this`) in the lambda means the callback itself holds a ge
 
 ## 6. `weak_from_this()` (C++17)
 
-C++17 also added `weak_from_this()`, returning a `std::weak_ptr<T>` instead of a `shared_ptr<T>`. It's the safer tool when you're not certain, at the call site, whether the object is currently `shared_ptr`-managed — because `weak_from_this()` doesn't throw in the unmanaged case; it simply returns an empty `weak_ptr`, which `.lock()` then turns into an empty `shared_ptr` rather than an exception:
+C++17 also added `weak_from_this()`, returning a `std::weak_ptr<T>` instead of a `shared_ptr<T>`. It's the safer tool when you're not certain, at the call site, whether the object is currently `shared_ptr`-managed — because `weak_from_this()` doesn't throw in the unmanaged case; it simply returns an empty `weak_ptr`, which `.lock()` then turns into an empty `shared_ptr` rather than an exception.
+
+The difference isn't just about avoiding an exception, though — the two choices produce genuinely different lifetime behavior. The clearest way to see it is to put both side by side on the same `Connection` from Section 5, extended with async callbacks:
 
 ```cpp
-void maybe_register() {
-    if (auto self = weak_from_this().lock()) {
-        // self is non-null: this object genuinely is managed by a shared_ptr right now
-        registry.add(self);
-    } else {
-        // gracefully handle the case where it isn't, instead of catching bad_weak_ptr
+class Connection : public std::enable_shared_from_this<Connection> {
+public:
+    void start_read_keepalive() {
+        auto self = shared_from_this();   // shared_ptr: bumps the refcount now
+        socket_.async_read_some(buffer_,
+            [self](std::error_code ec, std::size_t n) {
+                // 'self' has been keeping the Connection alive this whole time.
+                // Even if every other shared_ptr to it went out of scope
+                // the moment async_read_some() was called, the object is
+                // still here, and this call is always safe.
+                self->handle_read(ec, n);
+            });
     }
-}
+
+    void start_read_observe_only() {
+        auto weak_self = weak_from_this();   // weak_ptr: does NOT bump the refcount
+        socket_.async_read_some(buffer_,
+            [weak_self](std::error_code ec, std::size_t n) {
+                // If every shared_ptr to the Connection was released while
+                // this read was in flight, the object may already be gone
+                // by the time this callback runs.
+                if (auto self = weak_self.lock()) {
+                    // self is a real, fresh shared_ptr, locked in one atomic
+                    // step — the object is guaranteed alive for as long as
+                    // 'self' is in scope.
+                    self->handle_read(ec, n);
+                }
+                // else: the Connection was destroyed before this callback
+                // fired — silently skip, no code runs on the dead object.
+            });
+    }
+};
 ```
+
+The difference in practice: `start_read_keepalive()` guarantees the callback always runs correctly — at the cost of the `Connection` being unable to be destroyed as long as even one such callback is still pending (the object outlives what the caller's own `shared_ptr` count might suggest from the outside). `start_read_observe_only()` lets the `Connection` be destroyed the moment the last owning `shared_ptr` elsewhere goes away — but then the pending callback has nothing left to act on, and must back off safely instead.
+
+**Pitfall: never split the check from the lock.** It's tempting to write `if (!weak_self.expired()) { auto self = weak_self.lock(); ... }`, but this is a TOCTOU (time-of-check-to-time-of-use) race: between the `expired()` check and the `lock()` call — even just two lines apart, even on a single thread if something reentrant happens in between, and trivially on a multithreaded system where another thread can drop the last `shared_ptr` concurrently — the object can be destroyed. `expired()` only tells you the state _at that instant_; it gives no guarantee about the next line. `lock()` alone is the only operation that atomically does both: it checks whether the control block is still alive _and_, if so, creates a genuine owning `shared_ptr` in the same indivisible step, closing the window entirely. The correct pattern is always: call `lock()` once, and branch on whether the result is non-null — never `expired()` followed by a separate `lock()`.
 
 This is generally the better default whenever the calling context can't structurally guarantee `shared_ptr` ownership — library code called from contexts you don't fully control, for instance — since it turns a potential exception into an ordinary, checkable condition.
 

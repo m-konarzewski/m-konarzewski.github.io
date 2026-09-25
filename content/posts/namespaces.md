@@ -1,7 +1,7 @@
 +++ 
 draft = true
 date = 2026-09-07T23:26:17+02:00
-title = "Namespaces in C++: Headers vs. Source Files"
+title = "Namespaces in C++: Headers vs. source files"
 tags = ["namespaces", "anonymous-namespace", "internal-linkage", "inline-namespace"]
 categories = ["C++"]
 +++
