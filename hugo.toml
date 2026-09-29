@@ -26,16 +26,13 @@ enableEmoji = true
   since = 2026
 
   customCSS = ["css/custom.css"]
+  customJS = ["js/code-copy.js"]
 
   [params.utterances]
     repo = "m-konarzewski/m-konarzewski.github.io"
     issueTerm = "pathname"
     label = "comments"
     theme = "github-light"
-
-  # Podświetlanie skladni kodu (wazne dla postow o C++)
-  [params.codeCopyButton]
-    enable = true
 
 [markup]
   [markup.highlight]

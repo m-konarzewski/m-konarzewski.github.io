@@ -167,6 +167,59 @@ section.container.list {
   word-break: break-word;
 }
 
+.content .highlight {
+  position: relative;
+}
+
+.code-copy-button {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.7rem;
+  z-index: 1;
+  display: inline-grid;
+  width: 2.8rem;
+  height: 2.8rem;
+  padding: 0;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  color: inherit;
+  background: rgba(127, 127, 127, 0.2);
+  font: inherit;
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+
+.code-copy-button:hover {
+  background: rgba(127, 127, 127, 0.35);
+}
+
+.code-copy-button::after {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  padding: 0.35rem 0.6rem;
+  border-radius: 3px;
+  color: #fff;
+  background: #303030;
+  content: attr(data-tooltip);
+  font-size: 1.2rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease-in-out;
+}
+
+.code-copy-button:hover::after,
+.code-copy-button:focus-visible::after {
+  opacity: 1;
+}
+
+.code-copy-button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
 @media (max-width: 980px) {
   section.container.list,
   .list ul,
