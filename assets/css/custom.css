@@ -4,6 +4,11 @@
   hyphens: none;
 }
 
+.content .post-content li {
+  text-align: justify;
+  text-justify: auto;
+}
+
 /* Global page width override */
 .container {
   max-width: min(90rem, 100%) !important;

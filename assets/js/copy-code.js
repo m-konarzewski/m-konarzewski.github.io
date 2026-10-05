@@ -27,6 +27,15 @@ function copyTextFallback(text) {
   return Promise.resolve();
 }
 
+function getCodeText(code) {
+  const lines = Array.from(code.children);
+  const text = lines.length
+    ? lines.map((line) => line.textContent.replace(/\r?\n$/, "")).join("\n")
+    : code.textContent;
+
+  return text.replace(/\r?\n$/, "");
+}
+
 function addCodeCopyButtons() {
   document.querySelectorAll(".content .highlight").forEach((highlight) => {
     const table = highlight.querySelector("table");
@@ -47,7 +56,7 @@ function addCodeCopyButtons() {
     button.dataset.tooltip = "Copy";
     button.addEventListener("click", async () => {
       try {
-        await copyText(code.innerText);
+        await copyText(getCodeText(code));
         button.dataset.tooltip = "Copied!";
       } catch {
         button.dataset.tooltip = "Copy failed";

@@ -26,7 +26,7 @@ enableEmoji = true
   since = 2026
 
   customCSS = ["css/custom.css"]
-  customJS = ["js/code-copy.js"]
+  customJS = ["js/copy-code.js"]
 
   [params.utterances]
     repo = "m-konarzewski/m-konarzewski.github.io"
